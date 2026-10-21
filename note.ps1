@@ -35,6 +35,22 @@ try {
                 }
             }
         }
+
+        'delete' {
+            if ($args.Count -lt 2) {
+                throw 'hash required'
+            }
+            $hash = [string]$args[1]
+            # Only allow complete hashes, never paths or wildcard expressions.
+            if ($hash -cnotmatch '\A[0-9a-f]{64}\z') {
+                throw 'invalid hash: expected a complete lowercase SHA-256 hash'
+            }
+            $path = Join-Path $notesDir $hash
+            if (-not [System.IO.File]::Exists($path)) {
+                throw "no note with hash $hash"
+            }
+            [System.IO.File]::Delete($path)
+        }
         default {
             throw 'Usage: note add <text> | note list'
         }
